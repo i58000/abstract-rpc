@@ -1,0 +1,46 @@
+<script src="/index.js"></script>
+<script>
+    let listener1 = null;
+    let listener2 = null;
+
+    class SomeRPC extends AbstractRPC.default {
+        label() { return 'some' }
+        postMessage(msg) {
+            listener2(msg)
+        }
+        addMessageListener(li) {
+            listener1 = li
+        }
+        removeMessageListener(li) {
+            listener1 = null
+        }
+    }
+
+
+    class AnotherRPC extends AbstractRPC.default {
+        label() { return 'another' }
+        postMessage(msg) {
+            listener1(msg)
+        }
+        addMessageListener(li) {
+            listener2 = li
+        }
+        removeMessageListener(li) {
+            listener2 = null
+        }
+    }
+
+    const someRPC = new SomeRPC();
+    const anotherRPC = new AnotherRPC();
+
+    someRPC.start()
+    anotherRPC.start()
+
+    someRPC.procedure('double', (v) => v * 2);
+
+    const v = 3;
+    anotherRPC.call('double', v).then(res => {
+        console.log('doube', v, 'is', res)
+    })
+
+</script>
